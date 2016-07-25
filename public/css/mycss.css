@@ -1,0 +1,60 @@
+.img-small{
+    width:100px;
+}
+.img-large{
+    width:400px;
+
+}
+.img-fit{
+    width: 200px;
+}
+.quick-view b:hover{
+    color:red;
+}
+#myInp {
+    height: 5px;
+    width: 100px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+    /* background-image: url('http://www.w3schools.com/howto/searchicon.png'); */
+    box-sizing: border-box;
+    border: 1px solid #d2d6de;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: white;
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    /* padding: 12px 20px 12px 40px; */
+    -webkit-transition: width .4s ease-in-out;
+    transition: width .4s ease-in-out;
+}
+
+/* When the input field gets focus, change its width to 100% */
+#myInp:focus {
+    width: 150px;
+}
+#sel1{
+    border-radius: 15px;
+    box-shadow: none;
+    height: 25px;
+    padding-top: 0px;
+    display: inline;
+    max-width: 90px;
+    border-color: #d2d6de;
+}
+/*input[type=text]#myInp {
+    width: 130px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+   
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width .4s ease-in-out;
+    transition: width .4s ease-in-out;
+}*/
