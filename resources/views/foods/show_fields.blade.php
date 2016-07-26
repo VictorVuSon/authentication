@@ -9,6 +9,11 @@
     {!! Form::label('name', 'Name:') !!}
     <p>{!! $food->name !!}</p>
 </div>
+<!-- Name Field -->
+<div class="form-group">
+    {!! Form::label('creator', 'Creator:') !!}
+    <p>{!! $food->user->name !!}</p>
+</div>
 
 <!-- Image Field -->
 <div class="form-group">

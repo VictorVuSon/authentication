@@ -24,10 +24,15 @@ class AuthServiceProvider extends ServiceProvider {
      */
     public function boot(GateContract $gate) {
         $this->registerPolicies($gate);
-//        $gate->define('admin', function ($user) {
-//            return $user->is_admin == 0;
-//        });
-        
+        $gate->define('admin', function ($user) {
+            return $user->is_admin == 1;
+        });
+        $gate->define('user', function ($user) {
+            return $user->is_admin == 0;
+        });
+        $gate->define('author_food', function ($user,$food) {
+            return $user->id == $food->author;
+        });
     }
 
 }

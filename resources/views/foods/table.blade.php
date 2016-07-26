@@ -7,6 +7,8 @@
     <th>Category:
         {!! Form::select('category_id',$categories,isset($_GET['cat']) ? $_GET['cat']:null   , ['class' => 'form-control id_cat','id'=>'sel1']) !!}
     </th>
+    <th>Author
+    </th>
     <th>Content</th>
     <th>{!!Form::button('Search',['class'=>'btn-default search-btn','onclick'=>'search()'])!!}</th>
 </thead>
@@ -27,10 +29,12 @@
 </script>
 <tbody>
     @foreach($foods as $food)
+    @if(Auth::user()->id == $food->author)
     <tr>
         <td>{!! $food->name !!}</td>
         <td><img src ="{{url('/uploads/'.$food->image)}}" id ="" class ="img-small" /></td>
-        <td>{!! $food->category->name !!}</td>
+        <td>{{$food -> category->name}}</td>
+        <td>{{$food->user->name}}</td>
         <td>{!! $food->content !!}</td>
         <td>
             {!! Form::open(['route' => ['foods.destroy', $food->id], 'method' => 'delete']) !!}
@@ -42,6 +46,7 @@
             {!! Form::close() !!}
         </td>
     </tr>
+    @endif
     @endforeach
 </tbody>
 </table>

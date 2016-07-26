@@ -124,4 +124,9 @@ class user extends Model
 //        'avatar' => 'required|image',
 //        'is_admin' => 'required'
 //    ];
+    public function foods()
+    {
+        return $this->hasMany('App\Models\food','author','id');
+        
+    }
 }

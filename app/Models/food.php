@@ -60,7 +60,8 @@ class food extends Model {
         'name',
         'image',
         'category_id',
-        'content'
+        'content',
+        'author'
     ];
 
     /**
@@ -72,7 +73,8 @@ class food extends Model {
         'name' => 'string',
         'image' => 'string',
         'category_id' => 'integer',
-        'content' => 'string'
+        'content' => 'string',
+        'author' => 'integer'
     ];
 
     /**
@@ -115,7 +117,10 @@ class food extends Model {
 //    ];
 
     public function category() {
-        return $this->belongsTo('App\Models\category');
+        return $this->belongsTo('App\Models\category','category_id','id');
+    }
+    public function user() {
+        return $this->belongsTo('App\Models\user','author','id');
     }
 
 }

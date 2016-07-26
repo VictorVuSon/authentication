@@ -22,6 +22,7 @@ class CreateusersTable extends Migration
             $table->string('avatar');
             $table->integer('is_admin');
             $table->timestamps();
+            $table->rememberToken();
             $table->softDeletes();
         });
     }

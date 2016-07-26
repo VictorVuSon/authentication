@@ -81,14 +81,17 @@ class foodController extends InfyOmBaseController {
      */
     public function store(CreatefoodRequest $request) {
         $input = $request->all();
+        $input['author'] = $request->user()->id;
+        
         $file = $request->file('image');
         $file_name = $file->getClientOriginalName();
         $ext_name = $file->getClientOriginalExtension();
         $file_name = "food-" . time() . "." . $ext_name;
         $input['image'] = $file_name;
+        $food = $this->foodRepository->create($input);
         $destinationPath = 'uploads';
         $file->move($destinationPath, $file_name);
-        $food = $this->foodRepository->create($input);
+        
 
         Flash::success('food saved successfully.');
 
@@ -104,6 +107,9 @@ class foodController extends InfyOmBaseController {
      */
     public function show($id) {
         $food = $this->foodRepository->findWithoutFail($id);
+        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+            return redirect('/foods');
+        }
         if (empty($food)) {
             Flash::error('food not found');
 
@@ -121,6 +127,9 @@ class foodController extends InfyOmBaseController {
      */
     public function edit($id) {
         $food = $this->foodRepository->findWithoutFail($id);
+        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+            return redirect('/foods');
+        }
         $array = array();
         $categories = \App\Model\Category::all(['id', 'name']);
         foreach ($categories as $cat) {
@@ -139,8 +148,11 @@ class foodController extends InfyOmBaseController {
      * @return Response
      */
     public function update($id, UpdatefoodRequest $request) {
+        
         $food = $this->foodRepository->findWithoutFail($id);
-
+        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+            return redirect('/foods');
+        }
         if (empty($food)) {
             Flash::error('food not found');
 
@@ -162,6 +174,7 @@ class foodController extends InfyOmBaseController {
         } else {
             $input['image'] = $food->image;
         }
+        $input['author'] = \Request::user()->id;
         $food = $this->foodRepository->update($input, $id);
         Flash::success('food updated successfully.');
 
@@ -177,7 +190,9 @@ class foodController extends InfyOmBaseController {
      */
     public function destroy($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-
+        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+            return redirect('/foods');
+        }
         if (empty($food)) {
             Flash::error('food not found');
 
