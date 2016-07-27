@@ -12,14 +12,16 @@
  */
 //'middleware' => 'admin'
 ////
-Route::get('/error', function() {
-    abort(404);
-});
+//Route::get('/error', function() {
+//    abort(404);
+//});
 Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/home', 'HomeController@index');
 Route::auth();
+
+//Route::resource();
 /*
   |--------------------------------------------------------------------------
   | API routes
@@ -110,6 +112,7 @@ Route::group(['middleware' => 'user'], function() {
 });
 Route::group(['middleware' => 'admin'], function() {
     Route::resource('users', 'userController');
+    Route::get('user/getIndex','userController@getIndex')->name('user.getIndex');
     Route::resource('pages', 'pageController');
     Route::resource('categories', 'categoryController');
 });

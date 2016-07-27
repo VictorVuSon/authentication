@@ -15,7 +15,8 @@
         "jlapp/swaggervel": "dev-master",
         "infyomlabs/laravel-generator": "dev-master",
         "infyomlabs/generator-builder": "dev-master",
-        "prettus/l5-repository": "^2.6"
+        "prettus/l5-repository": "^2.6",
+        "yajra/laravel-datatables-oracle": "^6.16"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -15,7 +15,7 @@ class IsAdmin {
      * @return mixed
      */
     public function handle($request, Closure $next) {
-        if ($request->user()->is_admin == '1' && \Auth::check()) {
+        if (\Auth::check()&& $request->user()->is_admin == '1') {
             return $next($request);
         }
         return new RedirectResponse(url('/home'));

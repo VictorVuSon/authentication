@@ -1,35 +1,52 @@
 <table class="table table-responsive" id="users-table">
     <thead>
-        <th>Email</th>
-        <th>Name</th>
-        <th>Is Admin</th>
-        <th colspan="3">Action</th>
-    </thead>
-    <tbody>
-    @foreach($users as $user)
         <tr>
-            <td>{!! $user->email !!}</td>
-            
-            <td>{!! $user->name !!}</td>
-            
-            <td>
-                @if($user->is_admin == 1)
-                    Admin
-                @else
-                    User
-                @endif
-            <td>
-                {!! Form::open(['route' => ['users.destroy', $user->id], 'method' => 'delete']) !!}
-                <div class='btn-group'>
-                    <a href="{!! route('users.show', [$user->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
-                    <a href="{!! route('users.edit', [$user->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
-                    @if($user->is_admin != 1)
-                        {!! Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
-                    @endif
-                </div>
-                {!! Form::close() !!}
-            </td>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Action</th>
         </tr>
-    @endforeach
-    </tbody>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </tfoot>
 </table>
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+    tfoot {
+        display: table-header-group;
+    }
+</style>
+<script>
+    $(function () {
+        $('#users-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('user.getIndex') !!}',
+            columns: [
+                {data: 'id', name: 'id'},
+                {data: 'name', name: 'name'},
+                {data: 'email', name: 'email'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    var column = this;
+                    var input = document.createElement("input");
+                    $(input).appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                column.search($(this).val()).draw();
+                            });
+                });
+            }
+        });
+    });
+</script>
