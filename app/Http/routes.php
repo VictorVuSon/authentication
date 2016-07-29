@@ -109,10 +109,12 @@ Route::group(['middleware' => 'user'], function() {
     Route::get('field_template', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@fieldTemplate');
     Route::post('generator_builder/generate', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@generate');
     Route::resource('foods', 'foodController');
+    Route::get('food/getIndex','foodController@getIndex')->name('food.getIndex');
 });
 Route::group(['middleware' => 'admin'], function() {
     Route::resource('users', 'userController');
     Route::get('user/getIndex','userController@getIndex')->name('user.getIndex');
+    
     Route::resource('pages', 'pageController');
     Route::resource('categories', 'categoryController');
 });

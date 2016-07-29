@@ -1,52 +1,60 @@
 <table class="table table-responsive" id="foods-table">
     <thead>
-    <th>Name
-        <input type="text" name="search" placeholder="Name..." value = "<?php echo (isset($_GET['name']) ? $_GET['name'] : null); ?>" id='myInp'>
-    </th>
-    <th>Image</th>
-    <th>Category:
-        {!! Form::select('category_id',$categories,isset($_GET['cat']) ? $_GET['cat']:null   , ['class' => 'form-control id_cat','id'=>'sel1']) !!}
-    </th>
-    <th>Author
-    </th>
-    <th>Content</th>
-    <th>{!!Form::button('Search',['class'=>'btn-default search-btn','onclick'=>'search()'])!!}</th>
-</thead>
-
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Author</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Author</th>
+        </tr>
+    </tfoot>
+</table>
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+    tfoot {
+        display: table-header-group;
+    }
+</style>
 <script>
-    $('.id_cat').change(function () {
-        var name = $('#myInp').val();
-        $(this).find(":selected").each(function () {
-//                console.log($(this).val());
-            window.location.replace("foods?name=" + name + "&&cat=" + $(this).val());
+    $(function () {
+        var table = $('#foods-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{!! route('food.getIndex') !!}'
+            },
+            columns: [
+                {data: 'id_food', name: 'id_food'},
+                {data: 'name_food', name: 'name_food'},
+                {data: 'category_id', name: 'category_id'},
+                {data: 'author_name', name: 'author_name'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    var column = this;
+                    var input = document.createElement("input");
+                    if (column.index() === 2) {
+                        input = $('{{Form::select("category", $categories, "")}}');
+                    }
+                    $(input).appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                column.search($(this).val()).draw();
+                            });
+                });
+            }
         });
     });
-    function search() {
-        var name = $('#myInp').val();
-        var id_cat = $('.id_cat').val();
-        window.location.replace("foods?name=" + name + "&&cat=" + id_cat);
-    }
 </script>
-<tbody>
-    @foreach($foods as $food)
-    @if(Auth::user()->id == $food->author)
-    <tr>
-        <td>{!! $food->name !!}</td>
-        <td><img src ="{{url('/uploads/'.$food->image)}}" id ="" class ="img-small" /></td>
-        <td>{{$food -> category->name}}</td>
-        <td>{{$food->user->name}}</td>
-        <td>{!! $food->content !!}</td>
-        <td>
-            {!! Form::open(['route' => ['foods.destroy', $food->id], 'method' => 'delete']) !!}
-            <div class='btn-group'>
-                <a href="{!! route('foods.show', [$food->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
-                <a href="{!! route('foods.edit', [$food->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
-                {!! Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
-            </div>
-            {!! Form::close() !!}
-        </td>
-    </tr>
-    @endif
-    @endforeach
-</tbody>
-</table>

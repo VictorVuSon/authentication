@@ -34,17 +34,16 @@ class userController extends InfyOmBaseController {
     public function index(Request $request) {
         return view('users.index');
     }
-
     public function getIndex() {
-        $users = user::all(['id', 'name', 'email']);
+        $users = user::all(['id', 'name', 'email','is_admin']);
         return Datatables::of($users)
-//                ->add_column('action', '<a href="{{{ URL::to(\'users/\' . $id . \'/edit\' ) }}}" class="btn btn-success btn-sm iframe" ><span class="glyphicon glyphicon-pencil"></span>  {{ Lang::get("admin/modal.edit") }}</a>
-//                <a href="{{{ URL::to(\'users/\' . $id . \'\' ) }}}" class="btn btn-sm btn-danger iframe"><span class="glyphicon glyphicon-eye-open"></span> {{ Lang::get("admin/modal.delete") }}</a>
-//                '."{!! Form::open(['route' => ['users.destroy',3], 'method' => 'delete']) !!}{!! Form::button('<i class=\'glyphicon glyphicon-trash\'></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs','onclick' => 'return confirm(\'Are you sure?\')']) !!}{!! Form::close() !!}")
-//                        ->make(true);
                         ->addColumn('action', function($user) {
                             return view('users.actions')->with('user', $user);
-                        })->make(true);
+                        })
+                        ->editColumn('name', '{{$name}}')
+                        ->editColumn('email', '{{$email}}')
+                        ->editColumn('is_admin', '@if($is_admin == 1) Admin @else User @endif')        
+                        ->make(true);
     }
 
     /**

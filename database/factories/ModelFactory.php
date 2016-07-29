@@ -19,3 +19,16 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+$factory->define(App\Food::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+        'image' => "",
+        'category_id' => function () {
+            return factory(\App\Models\category::class)->create()->id;
+        },
+        'content' => $faker->paragraph,
+        'author' => function () {
+            return factory(\App\Models\user::class)->create()->id;
+        }
+    ];
+});

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use Yajra\Datatables\Datatables;
 use App\Http\Requests\CreatefoodRequest;
 use App\Http\Requests\UpdatefoodRequest;
 use App\Repositories\foodRepository;
@@ -28,33 +29,31 @@ class foodController extends InfyOmBaseController {
      * @return Response
      */
     public function index(Request $request) {
-//        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $array = array();
-        $name = null;
-        $id_cat = null;
-        if(isset($_GET['name'])){
-            $name = $_GET['name'];
-        }
-        if(isset($_GET['cat'])){
-            $id_cat = $_GET['cat'];
-        }
-        if($name || $id_cat)
-        {
-            $foods = \App\Model\Food::where('name','like', '%'.$name.'%')->where('category_id', $id_cat)->get();
-//            $foods = $this->foodRepository->paginate(PAGINATE);
-        }
-        else{
-            $this->foodRepository->pushCriteria(new RequestCriteria($request));
-            $foods = $this->foodRepository->all();
-        }
         $categories = \App\Model\Category::all(['id', 'name']);
+        $array['']="";
         foreach ($categories as $cat) {
             $array[$cat->id] = $cat->name;
         }
-        
-        return view('foods.index')
-                        ->with('foods', $foods)
-                        ->with('categories',$array);
+        return view('foods.index')->with('categories', $array);
+        ;
+    }
+
+    public function getIndex() {
+//        $foods = \App\Models\food::all();
+        $foods = \App\Models\food::
+            join('categories','categories.id','=','foods.category_id')
+            ->join('users','users.id','=','foods.author')
+            ->select('foods.id as id_food','foods.name as name_food','foods.category_id','users.name as author_name')
+            ->get();
+        return Datatables::of($foods)
+                        ->addColumn('action', function ($food) {
+                            return view('foods.actions')->with('food', $food);
+                        })
+                        ->editColumn('category_id', function ($food) {
+                            return $food->category->name;
+                        })
+                        ->editColumn('name_food', '{{$name_food}}')
+                        ->make(true);
     }
 
     /**
@@ -82,7 +81,7 @@ class foodController extends InfyOmBaseController {
     public function store(CreatefoodRequest $request) {
         $input = $request->all();
         $input['author'] = $request->user()->id;
-        
+
         $file = $request->file('image');
         $file_name = $file->getClientOriginalName();
         $ext_name = $file->getClientOriginalExtension();
@@ -91,7 +90,7 @@ class foodController extends InfyOmBaseController {
         $food = $this->foodRepository->create($input);
         $destinationPath = 'uploads';
         $file->move($destinationPath, $file_name);
-        
+
 
         Flash::success('food saved successfully.');
 
@@ -107,7 +106,7 @@ class foodController extends InfyOmBaseController {
      */
     public function show($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+        if (\Gate::denies('author_food', \Auth::user(), $food)) {
             return redirect('/foods');
         }
         if (empty($food)) {
@@ -127,7 +126,7 @@ class foodController extends InfyOmBaseController {
      */
     public function edit($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+        if (\Gate::denies('author_food', \Auth::user(), $food)) {
             return redirect('/foods');
         }
         $array = array();
@@ -148,9 +147,9 @@ class foodController extends InfyOmBaseController {
      * @return Response
      */
     public function update($id, UpdatefoodRequest $request) {
-        
+
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+        if (\Gate::denies('author_food', \Auth::user(), $food)) {
             return redirect('/foods');
         }
         if (empty($food)) {
@@ -190,7 +189,7 @@ class foodController extends InfyOmBaseController {
      */
     public function destroy($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(),$food)) {
+        if (\Gate::denies('author_food', \Auth::user(), $food)) {
             return redirect('/foods');
         }
         if (empty($food)) {
@@ -205,16 +204,18 @@ class foodController extends InfyOmBaseController {
 
         return redirect(route('foods.index'));
     }
-    public function executeSearch(){
+
+    public function executeSearch() {
         $keywords = \Illuminate\Support\Facades\Input::get('keywords');
-        echo $keywords;die();
+        echo $keywords;
+        die();
         $foods = \App\Model\Food::all();
         $searchFoods = new \Illuminate\Database\Eloquent\Collection();
-        foreach($foods as $f){
-             if(\Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower($f->name), \Illuminate\Support\Str::lower($keywords)))
-                     $searchFoods->add ($u);
+        foreach ($foods as $f) {
+            if (\Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower($f->name), \Illuminate\Support\Str::lower($keywords)))
+                $searchFoods->add($u);
         }
-        return View::make('searchFoods')->with('searchFoods',$searchFoods);
+        return View::make('searchFoods')->with('searchFoods', $searchFoods);
     }
 
 }

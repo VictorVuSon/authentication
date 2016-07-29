@@ -52,7 +52,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class food extends Model {
 
-    use SoftDeletes;
 
     public $table = 'foods';
     protected $dates = ['deleted_at'];

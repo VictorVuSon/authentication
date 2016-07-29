@@ -41,7 +41,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class page extends Model
 {
-    use SoftDeletes;
 
     public $table = 'pages';
     
