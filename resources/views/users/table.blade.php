@@ -31,6 +31,7 @@
 <script>
     $(function () {
         $('#users-table').DataTable({
+            "dom": 'lrtip',
             processing: true,
             serverSide: true,
             ajax: {

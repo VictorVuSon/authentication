@@ -145,9 +145,9 @@ class CatsController extends Controller
         try {
 
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-
+            
             $cat = $this->repository->update($id, $request->all());
-
+            @(\File::delete(public_path() . '\uploads' . '\\' . $cat->image));
             $response = [
                 'message' => 'Cat updated.',
                 'data'    => $cat->toArray(),
@@ -183,8 +183,9 @@ class CatsController extends Controller
      */
     public function destroy($id)
     {
+        
         $deleted = $this->repository->delete($id);
-
+        @(\File::delete(public_path() . '\uploads' . '\\' . $deleted->image));
         if (request()->wantsJson()) {
 
             return response()->json([

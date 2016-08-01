@@ -31,6 +31,9 @@ class AuthServiceProvider extends ServiceProvider {
             return $user->is_admin == 0;
         });
         $gate->define('author_food', function ($user,$food) {
+//            echo $user->id;
+            echo $food->author;
+            die();
             return $user->id == $food->author;
         });
     }

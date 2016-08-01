@@ -18,9 +18,6 @@
                     @include('categories.table')
             </div>
         </div>
-        <div class =''>
-            {{ $categories->links() }}
-        </div>
     </div>
 @endsection
 

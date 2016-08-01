@@ -29,7 +29,8 @@
 </style>
 <script>
     $(function () {
-        var table = $('#foods-table').DataTable({
+        $('#foods-table').DataTable({
+            "dom": 'lrtip',
             processing: true,
             serverSide: true,
             ajax: {

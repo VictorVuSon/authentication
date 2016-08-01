@@ -27,14 +27,23 @@ class categoryController extends InfyOmBaseController {
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request) {
-        $this->categoryRepository->pushCriteria(new RequestCriteria($request));
-        $categories = $this->categoryRepository->paginate(PAGINATE);
-
-        return view('categories.index')
-                        ->with('categories', $categories);
+    public function index() {
+        $categories = \App\Models\Category::all(['id', 'name']);
+        $array[''] = "";
+        foreach ($categories as $cat) {
+            $array[$cat->id] = $cat->name;
+        }
+        return view('categories.index')->with('categories',$array);
     }
 
+    public function getIndex(Request $request) {
+        $categories = \App\Models\category::all();
+        return \Datatables::of($categories)
+                        ->addColumn('action', function($category) {
+                            return view('categories.actions')->with('category', $category);
+                        })
+                        ->make(true);
+    }
     /**
      * Show the form for creating a new category.
      *
@@ -153,7 +162,7 @@ class categoryController extends InfyOmBaseController {
      */
     public function destroy($id) {
         $category = $this->categoryRepository->findWithoutFail($id);
-
+        @(\File::delete(public_path() . '\uploads' . '\\' . $category->image));
         if (empty($category)) {
             Flash::error('category not found');
 

@@ -29,24 +29,32 @@ class foodController extends InfyOmBaseController {
      * @return Response
      */
     public function index(Request $request) {
-        $categories = \App\Model\Category::all(['id', 'name']);
-        $array['']="";
+        $categories = \App\Models\Category::all(['id', 'name']);
+        $array[''] = "";
         foreach ($categories as $cat) {
             $array[$cat->id] = $cat->name;
         }
         return view('foods.index')->with('categories', $array);
-        ;
     }
 
-    public function getIndex() {
+    public function getIndex(Request $request) {
 //        $foods = \App\Models\food::all();
         $foods = \App\Models\food::
-            join('categories','categories.id','=','foods.category_id')
-            ->join('users','users.id','=','foods.author')
-            ->select('foods.id as id_food','foods.name as name_food','foods.category_id','users.name as author_name')
-            ->get();
+                join('categories', 'categories.id', '=', 'foods.category_id')
+                ->join('users', 'users.id', '=', 'foods.author')
+                ->select('foods.id as id_food', 'foods.name as name_food', 'foods.category_id', 'users.name as author_name')
+                ->where('foods.author', '=',$request->user()->id)
+                ->get();
+        if(\Auth::user()->id == 1){
+            $foods = \App\Models\food::
+                join('categories', 'categories.id', '=', 'foods.category_id')
+                ->join('users', 'users.id', '=', 'foods.author')
+                ->select('foods.id as id_food', 'foods.name as name_food', 'foods.category_id', 'users.name as author_name')
+                ->get();
+        }
+        
         return Datatables::of($foods)
-                        ->addColumn('action', function ($food) {
+                        ->addColumn('action', function($food) {
                             return view('foods.actions')->with('food', $food);
                         })
                         ->editColumn('category_id', function ($food) {
@@ -106,9 +114,10 @@ class foodController extends InfyOmBaseController {
      */
     public function show($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(), $food)) {
+        if($this->check_food_author(\Auth::user()->id,$food->author)){
             return redirect('/foods');
         }
+
         if (empty($food)) {
             Flash::error('food not found');
 
@@ -126,7 +135,7 @@ class foodController extends InfyOmBaseController {
      */
     public function edit($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(), $food)) {
+        if($this->check_food_author(\Auth::user()->id,$food->author)){
             return redirect('/foods');
         }
         $array = array();
@@ -149,7 +158,7 @@ class foodController extends InfyOmBaseController {
     public function update($id, UpdatefoodRequest $request) {
 
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(), $food)) {
+        if($this->check_food_author(\Auth::user()->id,$food->author)){
             return redirect('/foods');
         }
         if (empty($food)) {
@@ -189,33 +198,23 @@ class foodController extends InfyOmBaseController {
      */
     public function destroy($id) {
         $food = $this->foodRepository->findWithoutFail($id);
-        if (\Gate::denies('author_food', \Auth::user(), $food)) {
+        if($this->check_food_author(\Auth::user()->id,$food->author)){
             return redirect('/foods');
         }
         if (empty($food)) {
             Flash::error('food not found');
-
             return redirect(route('foods.index'));
         }
 
         $this->foodRepository->delete($id);
-
+        @(\File::delete(public_path() . '\uploads' . '\\' . $food->image));
         Flash::success('food deleted successfully.');
 
         return redirect(route('foods.index'));
     }
-
-    public function executeSearch() {
-        $keywords = \Illuminate\Support\Facades\Input::get('keywords');
-        echo $keywords;
-        die();
-        $foods = \App\Model\Food::all();
-        $searchFoods = new \Illuminate\Database\Eloquent\Collection();
-        foreach ($foods as $f) {
-            if (\Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower($f->name), \Illuminate\Support\Str::lower($keywords)))
-                $searchFoods->add($u);
-        }
-        return View::make('searchFoods')->with('searchFoods', $searchFoods);
+    
+    public function check_food_author($id,$author){
+        return($id != $author);
     }
 
 }

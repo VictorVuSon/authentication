@@ -1,24 +1,55 @@
-<table class="table table-responsive" id="categories-table">
+<table class="table table-responsive" id="foods-table">
     <thead>
-        <th>Name</th>
-        <th>Image</th>
-        <th colspan="3">Action</th>
-    </thead>
-    <tbody>
-    @foreach($categories as $category)
         <tr>
-            <td>{{ $category->name }}</td>
-            <td><img src = "{{ url('/uploads/'.$category->image) }}" class ="img-small" /></td>
-            <td>
-                {!! Form::open(['route' => ['categories.destroy', $category->id], 'method' => 'delete']) !!}
-                <div class='btn-group'>
-                    <a href="{!! route('categories.show', [$category->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
-                    <a href="{!! route('categories.edit', [$category->id]) !!}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
-                    {!! Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
-                </div>
-                {!! Form::close() !!}
-            </td>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Action</th>
         </tr>
-    @endforeach
-    </tbody>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>ID</th>
+            <th>Category</th>
+        </tr>
+    </tfoot>
 </table>
+<style>
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+    tfoot {
+        display: table-header-group;
+    }
+</style>
+<script>
+    $(function () {
+        $('#foods-table').DataTable({
+            "dom": 'lrtip',
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{!! route('category.getIndex') !!}'
+            },
+            columns: [
+                {data: 'id', name: 'id'},
+                {data: 'name', name: 'name'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    var column = this;
+                    var input = "";
+                    if (column.index() === 1) {
+                        input = document.createElement("input");
+                    }
+                    $(input).appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                column.search($(this).val()).draw();
+                            });
+                });
+            }
+        });
+    });
+</script>

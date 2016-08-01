@@ -115,7 +115,7 @@ class userController extends InfyOmBaseController {
      */
     public function edit($id) {
         $user = $this->userRepository->findWithoutFail($id);
-
+        @(\File::delete(public_path() . '\uploads' . '\\' . $user->avatar));
         if (empty($user)) {
             Flash::error('user not found');
 
@@ -173,7 +173,6 @@ class userController extends InfyOmBaseController {
      */
     public function destroy($id) {
         $user = $this->userRepository->findWithoutFail($id);
-
         if (empty($user)) {
             Flash::error('user not found');
 
